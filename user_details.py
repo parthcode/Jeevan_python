@@ -31,14 +31,22 @@ class SignUp(UserDetails):
     def __init__(self, name, user_id, password):
         super().__init__(name, user_id, password)
 
+    def generate_payload(self, data):
+        data_payload = json.loads(data)
+        payload = {self.user_id: {
+            "name": self.name,
+            "password": self.password
+        }}
+        return data_payload.update(payload)
+
     def create_user_details(self):
-        data = json.dumps(self.get_user_data(operation='sign_up'))
         meta_data = open(SignUp.LOCATION, 'r+')
-        meta_data.write(data)
+        data = json.dumps(meta_data.read())
+        new_data = self.generate_payload(data)
+        meta_data.write(new_data)
         meta_data.close()
 
     def get_user_data(self, operation):
         if operation == 'sign_up':
             return {"user_id": self.user_id, "name": self.name, "password": self.password}
         return {"name": self.name, "password": self.password}
-
